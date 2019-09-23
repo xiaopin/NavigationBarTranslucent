@@ -31,7 +31,14 @@
     // 这里需要取消系统的半透明效果
     if (@available(iOS 10.0, *)) {
         if ([self isKindOfClass:NSClassFromString(@"_UIVisualEffectSubview")]) {
-            alpha = 1.0;
+            /**
+             * iOS会自动采用`AVFullScreenViewController`来播放网页中的视频
+             * 而该控制器上的一些操作按钮也使用了`_UIVisualEffectSubview`视图
+             * 所以为了区分导航栏, 这里采用判断透明度的方式
+             */
+            if ((int)(alpha*100) == 85) {
+                alpha = 1.0;
+            }
         }
     } else {
         if ([self.superview isKindOfClass:NSClassFromString(@"_UIBackdropView")]) {
@@ -64,7 +71,7 @@ static NSTimeInterval kAlphaDuration = 0.5;
                                                   ];
         
         for (NSString *selectorStr in swizzledSelectors) {
-            NSString *replaceSelector = [@"xp_" stringByAppendingString:selectorStr];
+            NSString *replaceSelector = [@"nbt_" stringByAppendingString:selectorStr];
             Method orignalMethod = class_getInstanceMethod(self, NSSelectorFromString(selectorStr));
             Method swizzledMethod = class_getInstanceMethod(self, NSSelectorFromString(replaceSelector));
             method_exchangeImplementations(orignalMethod, swizzledMethod);
@@ -72,7 +79,7 @@ static NSTimeInterval kAlphaDuration = 0.5;
     });
 }
 
-- (void)xp__updateInteractiveTransition:(CGFloat)percentComplete {
+- (void)nbt__updateInteractiveTransition:(CGFloat)percentComplete {
     id<UIViewControllerTransitionCoordinator> transitionCoordinator = self.topViewController.transitionCoordinator;
     if (transitionCoordinator) {
         UIViewController *fromVC = [transitionCoordinator viewControllerForKey:UITransitionContextFromViewControllerKey];
@@ -81,22 +88,22 @@ static NSTimeInterval kAlphaDuration = 0.5;
         CGFloat alpha = fromVC.navigationBarAlpha + (toVC.navigationBarAlpha - fromVC.navigationBarAlpha) * percentComplete;
         [self setNavigationBarBackgroundAlpha:alpha];
     }
-    [self xp__updateInteractiveTransition:percentComplete];
+    [self nbt__updateInteractiveTransition:percentComplete];
 }
 
-- (NSArray<UIViewController *> *)xp_popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
+- (NSArray<UIViewController *> *)nbt_popToViewController:(UIViewController *)viewController animated:(BOOL)animated {
     [UIView animateWithDuration:kAlphaDuration animations:^{
         [self setNavigationBarBackgroundAlpha:viewController.navigationBarAlpha];
     }];
-    return [self xp_popToViewController:viewController animated:animated];
+    return [self nbt_popToViewController:viewController animated:animated];
 }
 
-- (NSArray<UIViewController *> *)xp_popToRootViewControllerAnimated:(BOOL)animated {
+- (NSArray<UIViewController *> *)nbt_popToRootViewControllerAnimated:(BOOL)animated {
     CGFloat alpha = self.viewControllers.firstObject.navigationBarAlpha;
     [UIView animateWithDuration:kAlphaDuration animations:^{
         [self setNavigationBarBackgroundAlpha:alpha];
     }];
-    return [self xp_popToRootViewControllerAnimated:animated];
+    return [self nbt_popToRootViewControllerAnimated:animated];
 }
 
 #pragma mark <UINavigationBarDelegate>
