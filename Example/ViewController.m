@@ -18,11 +18,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if (@available(iOS 11.0, *)) {
-        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-    } else {
-        self.automaticallyAdjustsScrollViewInsets = NO;
-    }
     // translucent必须为YES,导航栏才能实现透明效果
     self.navigationController.navigationBar.translucent = YES;
     // 自定义导航栏颜色
@@ -61,9 +56,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    UIViewController *vc = [[UIViewController alloc] init];
-    vc.view.backgroundColor = [UIColor orangeColor];
-    [self.navigationController pushViewController:vc animated:YES];
 }
 
 

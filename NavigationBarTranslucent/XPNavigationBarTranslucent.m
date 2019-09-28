@@ -138,6 +138,10 @@ static NSTimeInterval kAlphaDuration = 0.5;
 
 - (void)setNavigationBarBackgroundAlpha:(CGFloat)alpha {
     UIView *barBackgroundView = self.navigationBar.subviews.firstObject;
+    if (@available(iOS 13.0, *)) {
+        barBackgroundView.alpha = alpha;
+        return;
+    }
     // 处理底部分割线
     UIView *shadowView = [barBackgroundView valueForKey:@"_shadowView"];
     shadowView.hidden = (alpha < 1.0);
